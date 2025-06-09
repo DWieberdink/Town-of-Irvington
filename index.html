@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Building Decision Tool</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <link rel="stylesheet" href="styles.css"><!-- if you have a separate CSS file -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+    font-family: "Franklin Gothic Book", "Franklin Gothic Medium", Arial, sans-serif;
+    padding: 1rem;
+    margin: 0;
+    background-color: #f9fafb;
+    color: #111827;
+  }
+
+  .container {
+    max-width: 1800px;
+    margin: 0 auto;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+@media (min-width: 1024px) {
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 3fr 1fr;
+    gap: 0.5rem;
+  }
+}
+
+  .left-sticky,
+  .right-sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    align-self: start;
+  }
+
+  .card {
+    background-color: white;
+    border-radius: 0.2rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+  }
+
+  .card-content {
+    padding: 0.2rem;
+  }
+
+  .flowchart-container {
+    padding: 0;
+  }
+
+  .flowchart-svg {
+    width: 100%;
+    height: 300px;
+    background-color: white;
+  }
+
+  .space-y-6 > * + * {
+    margin-top: 1.5rem;
+  }
+
+  .space-y-2 > * + * {
+    margin-top: 0.5rem;
+  }
+
+  label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+
+  select {
+    width: 100%;
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    border: 1px solid #d1d5db;
+    background-color: white;
+    font-size: 1rem;
+  }
+
+  .slider-container {
+    width: 100%;
+  }
+
+  input[type="range"] {
+    width: 100%;
+  }
+
+  table {
+    border-collapse: collapse;
+    margin-top: 1rem;
+    width: 100%;
+  }
+
+  th, td {
+    border: 1px solid #ccc;
+    padding: 6px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #f2f2f2;
+  }
+
+  tfoot tr th {
+    font-weight: bold;
+    background-color: #e8e8e8;
+  }
+
+  /* Flowchart specific styles */
+  .node rect {
+    fill: white;
+    stroke: #333;
+    stroke-width: 2px;
+  }
+
+  /* Only highlight the active outcome */
+  .node.outcome.active rect {
+    fill: #e6f4ea; /* Light green for active outcome */
+  }
+
+  .node.inactive rect {
+    stroke: #ccc !important;
+    fill: #f3f4f6 !important;
+  }
+
+  .node.inactive text {
+    fill: #999 !important;
+  }
+
+  /* Larger font for outcome nodes */
+  .node.outcome text {
+    font-size: 18px;
+    font-weight: 500;
+  }
+
+  .link {
+    stroke: #ccc;
+    stroke-width: 2px;
+    fill: none;
+  }
+
+  .link.active-yes {
+    stroke: #34a853; /* Green for "Yes" path */
+    stroke-width: 2.5px;
+  }
+
+  .link.active-no {
+    stroke: #ea4335; /* Red for "No" path */
+    stroke-width: 2.5px;
+  }
+
+  .link-label {
+    font-family: "Franklin Gothic Book", sans-serif;
+    font-size: 14px;
+    pointer-events: none;
+  }
+
+  .link-label.active {
+    font-weight: bold;
+  }
+
+  .link-label.inactive {
+    fill: #999;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Add background colors for summary table rows */
+  .addition-row {
+    background-color: #ffffff;
+  }
+  
+  .redistrict-row {
+    background-color: #ffffff;
+  }
+  
+  .portables-row {
+    background-color: #ffffff;
+  }
+  
+  .na-row {
+    background-color: #ffffff;
+  }
+
+    #school-summary-table th.ascending::after {
+      content: ' ▲';
+    }
+    #school-summary-table th:not(.ascending)::after {
+      content: ' ▼';
+    }
+
+  /* School size sliders */
+  .school-size-sliders {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-top: 1rem;
+    background-color: #f9fafb;
+  }
+
+  .school-size-sliders h4 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    font-weight: 500;
+  }
+
+  .school-info {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background-color: #f0f9ff;
+    border-radius: 0.5rem;
+    border: 1px solid #bae6fd;
+  }
+
+  .school-info h4 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    color: #0369a1;
+  }
+
+  .school-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .school-info-item {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .school-info-label {
+    font-size: 0.875rem;
+    color: #4b5563;
+  }
+
+  .school-info-value {
+    font-weight: 500;
+  }
+
+  .loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    font-size: 1.25rem;
+    color: #6b7280;
+  }
+
+  /* Spinner */
+  .spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border-left-color: #3b82f6;
+    animation: spin 1s linear infinite;
+    margin-right: 1rem;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Arrow markers */
+  .arrow-marker {
+    fill: none;
+  }
+  
+  /* Not applicable message */
+  .not-applicable-message {
+    padding: 1rem;
+    background-color: #f3f4f6;
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+    text-align: center;
+    font-style: italic;
+    color: #6b7280;
+    display: none;
+  }
+
+  /* Collapsible card styles */
+  .collapsible-card {
+    transition: max-height 0.1s ease;
+    overflow: hidden;
+  }
+
+  .collapsible-card .card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f3f4f6;
+  padding: 0.2rem 0.2rem;
+  cursor: pointer;
+  border-bottom: 0px solid #e5e7eb;
+}
+
+.collapse-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #374151;
+  margin-left: 1rem;
+  transition: transform 0.2s;
+}
+
+/* Highlighted node */
+.node rect.active {
+  stroke: #2563eb;
+  stroke-width: 4;
+  fill: #dbeafe;
+}
+
+
+
+  </style>
+<body class="bg-white text-black font-sans">
+  <header class="p-4 border-b shadow flex items-center justify-between">
+    <img src="public/images/logo-perkins-eastman.png" alt="Logo" class="h-12" />
+    <button onclick="location.href='Map_Index.html'" style="padding: 0.5rem 1rem; background-color: #1D4ED8; color: white; border-radius: 5px; border: none;">
+      Go to Map Planner
+    </button>
+  </header>
+ 
+
+
+    <div class="container">
+
+      
+
+  <div class="grid">
+     
+    <!-- Left: Controls and summary -->
+     
+          <div>
+            <div class="left-sticky">
+      <div class="card">
+        <div class="card-content" id="container">
+         
+          <h2>Strategic Decision Tool</h2>
+
+          <div class="space-y-6">
+            
+  
+            <div class="space-y-2">
+              <div style="display: none;">
+              <label for="utilization-slider">
+                Utilization Threshold: <span id="util-out">105</span>%
+              </label>
+              <div class="slider-container">
+                <input type="range" id="utilization-slider" min="100" max="120" step="1" value="105">
+              </div>
+            </div>
+            <div class="space-y-2">
+              <div style="display: none;">
+             <label for="funding-slider">
+              Funding Factor Threshold: <span id="funding-out">0.4</span>
+            </label>
+            <div class="slider-container">
+              <input type="range" id="funding-slider" min="0" max="1" step="0.1" value="0.4">
+            </div>
+            </div>
+            </div>
+            </div>
+            <div style="display: none;">
+            <div id="summary" class="mt-6">
+              
+              <h3>Summary</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Decision</th>
+                    <th># Schools</th>
+                  </tr>
+                </thead>
+                <tbody id="summary-body"></tbody>
+                <tfoot>
+                  <tr>
+                    <th>Total</th>
+                    <th id="summary-total">0</th>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+            </div>
+          </div>
+        </div>
+          <h3 style="margin-top: 45rem;">Building Decision Evalution by</h3>
+  <img src="PerkinsEastmanLogo.svg" alt="Perkins Eastman Logo" style="height: 12px; margin-bottom: 2rem;">
+      </div>
+    </div>
+    </div>
+
+
+      
+    <!-- CENTER column -->
+      <div style="width: 100%; margin: 0 auto;">
+        <!-- Top controls: grade-filter and school-select, side by side, centered -->
+        <div style="display: flex; gap: 1.5rem; align-items: flex-end; justify-content: center; margin-bottom: 1.5rem;">
+          <div class="space-y-2" style="width: 30rem; min-height: 5.5rem;">
+            <label for="grade-filter">Choose which building type:</label>
+            <select id="grade-filter" multiple></select>
+          </div>
+          <div class="space-y-2" style="width: 20rem; min-height: 5.5rem;">
+            <label for="school-select">Select Building:</label>
+            <select id="school-select">
+              <option value="">-- Select Building --</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Center column content: flowcharts, info band, and summary table -->
+        <div id="center-column-content">
+          <!-- School info band -->
+          <div class="card collapsible-card" id="school-info-band" style="display: none; margin-bottom: 1rem;">
+            <div class="card-header" onclick="toggleCollapse('school-info-content')">
+              <button type="button" class="collapse-btn" id="btn-school-info-content" aria-expanded="true">−</button>
+            </div>
+            <div class="card-content" id="school-info-content" style="padding: 0.75rem; font-size: 0.85rem; line-height: 1.2; background-color: #f0f9ff;">
+              <div style="text-align: center; font-size: 1rem; font-weight: bold; margin-bottom: 0.5rem;">
+                <span id="school-name">Building Name</span>
+              </div>
+              <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: center;">
+                <div style="display: flex; flex-wrap: wrap; gap: 0.2rem; align-items: center; justify-content: center;">
+                  <!-- Row 1 -->
+                  
+                  
+                  <div><strong>State Rated Capacity:</strong> <span id="state-rated-capacity">-</span></div>
+                  <!-- Row 2 -->
+                  <div style="flex-basis: 100%; height: 0;"></div>
+                 
+                  <div><strong>Space Constraints:</strong> <span id="ea-score">-</span></div>
+                  <div><strong>Functional Fit:</strong> <span id="funding-factor">-</span></div>
+                  <div style="display: none;">
+                  <div><strong>Building Age:</strong> <span id="building-age">-</span></div>
+                  <div><strong>Current Campus Score:</strong> <span id="campus-score-today">-</span></div>
+                  </div>
+                  <div><strong>Projected Building Score:</strong> <span id="campus-score">-</span></div>
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Not applicable message -->
+          <div id="not-applicable-message" class="not-applicable-message" style="margin-top: 0; margin-bottom: 1rem;">
+            This school has utilization below 100% and is not applicable for the decision flowchart.
+          </div>
+
+        
+
+          <!-- Renovation or Replacement Flowchart -->
+          <div class="card collapsible-card" style="margin-top:1.2rem;">
+            <div class="card-header" onclick="toggleCollapse('future-flowchart-body')">
+              <h3 style="display:inline">Renovation or Replacement</h3>
+              <button type="button" class="collapse-btn" id="btn-future-flowchart-body" aria-expanded="true">−</button>
+            </div>
+            <div class="card-content" id="future-flowchart-body" style="min-height: 300px;">
+              <svg id="future-flowchart-svg" class="flowchart-svg" viewBox="0 0 1600 650" style="width: 100%; height: 100%; display: block;" preserveAspectRatio="xMinYMin meet"></svg>
+            </div>
+          </div>
+
+          <!-- School Summary Table -->
+          <div class="card" style="margin-top: 2rem;">
+            <div class="card-header">
+              <div style="margin-bottom: 0.5rem; display: flex; gap: 0.5rem; align-items: center;">
+                <label for="school-summary-filter"></label>
+                <select id="school-summary-column" style="padding: 0.4rem; width: 12rem;">
+                  <option value="all">All Columns</option>
+                  <option value="0">Building Name</option>
+                  <option value="1">Building Type</option>
+                  <option value="2">Building Action</option>
+                  </select>
+                <input type="text" id="school-summary-filter" placeholder="Type to filter..." style="flex: 0.5; padding: 0.5rem;" />
+              </div>
+              <h3>Building Summary Table</h3>
+            </div>
+            <div class="card-content">
+              <table id="school-summary-table" style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                <thead>
+                  <tr>
+                    <th style="text-align: left; border-bottom: 1px solid #ccc; padding: 0.5rem;">Building Name</th>
+                    <th style="text-align: left; border-bottom: 1px solid #ccc; padding: 0.5rem;">Building Type</th>
+                    <th style="text-align: left; border-bottom: 1px solid #ccc; padding: 0.5rem;">Suggested Path Forward</th>
+                  </tr>
+                </thead>
+                <tbody id="school-summary-table-body">
+                  <!-- Rows will be populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+
+    <!-- Right: container-->
+    <div>
+      <div class="right-sticky">
+      <div class="card">
+        <div class="card-content" id="right-side-container">
+          <h3>Strategy for Building Decision</h3>
+        
+         <div class="space-y-2" style="margin-bottom: 1rem;">
+            <label for="campus-score-mode">Building Scoring:</label>
+            <select id="campus-score-mode">
+              <option value="projected">Projected (FY34-35)</option>
+              <option value="today">Current (FY24-25)</option>
+            </select>
+          </div>
+          
+          <div class="space-y-2">
+              <label for="campus-score-slider">
+              Current Facility Condition: <span id="campus-score-out">Fair</span>
+            </label>
+              <div class="slider-container">
+                <input type="range" id="campus-score-slider" min="2" max="6" step="1" value="4">
+              </div>
+              <div class="space-y-2">
+              <label for="ea-slider">
+                Space Constraints: <span id="ea-out">Good</span>
+              </label>
+              <input type="range" id="ea-slider" min="2" max="5" step="1" value="4">
+                            </div>
+              <div class="space-y-2">
+              <label for="renovation-funding-slider">
+                Functional Fit: <span id="renovation-funding-out">0.4</span>
+              </label>
+              <div class="slider-container">
+                <input type="range" id="renovation-funding-slider" min="0" max="1" step="0.1" value="0.4">
+              </div>
+            <div class="school-size-sliders">
+            <h4>Public Sentiment</h4>
+            <div class="space-y-2">
+              <label for="modAge-slider">
+                Modified Age for High Funding Factor: <span id="modAge-out">30</span>
+              </label>
+              <div class="slider-container">
+                <input type="range" id="modAge-slider" min="0" max="50" step="1" value="30">
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <label for="modAge2-slider">
+                Modified Age for Low Funding Factor: <span id="modAge2-out">20</span>
+              </label>
+              <div class="slider-container">
+                <input type="range" id="modAge2-slider" min="0" max="50" step="1" value="20">
+              </div>
+            </div>
+          </div>
+         
+        <div class="space-y-2">
+              <label for="systems-slider">
+            Systems Deficient: <span id="systems-out">3</span>
+          </label>
+          <input type="range" id="systems-slider" min="0" max="10" step="1" value="3">
+      </div>
+      
+    
+  <h3>Renovation or Replacement Summary</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Decision</th>
+        <th># Buildings</th>
+      </tr>
+    </thead>
+    <tbody id="future-summary-body"></tbody>
+    <tfoot>
+      <tr>
+        <th>Total</th>
+        <th id="future-summary-total">0</th>
+      </tr>
+    </tfoot>
+  </table>
+</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Only this script tag remains -->
+
+<script>
+  function enableSchoolTableSorting() {
+    const table = document.querySelector('#school-summary-table'); // ← precise selector
+    const headers = table.querySelectorAll('thead th');
+
+    headers.forEach((header, index) => {
+      header.style.cursor = 'pointer';
+      header.onclick = () => {
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        const ascending = header.classList.toggle('ascending');
+
+        // Remove arrow class from others
+        headers.forEach(h => { if (h !== header) h.classList.remove('ascending'); });
+
+        rows.sort((a, b) => {
+          const valA = a.children[index].textContent.trim().toLowerCase();
+          const valB = b.children[index].textContent.trim().toLowerCase();
+          return ascending
+            ? valA.localeCompare(valB, undefined, {numeric: true})
+            : valB.localeCompare(valA, undefined, {numeric: true});
+        });
+
+        rows.forEach(row => tbody.appendChild(row));
+      };
+    });
+  }
+
+
+</script>
+
+
+<script src="Irvington_flowchart.js"></script>
+</body>
+</html>

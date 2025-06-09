@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Irvington Site Planner</title>
+    <!-- Remove broken stylesheet link -->
+    <!-- <link rel="stylesheet" href="styles.css" /> -->
+
+    <!-- Load Mapbox -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+
+    <!-- Load Mapbox Draw -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.5.0/mapbox-gl-draw.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.5.0/mapbox-gl-draw.css" rel="stylesheet" />
+
+    <!-- Load Turf.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/turf.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.2.1/dist/chartjs-plugin-annotation.min.js"></script>
+        
+    <script src="https://cdn.tailwindcss.com"></script>
+
+
+  </head>
+<body class="bg-white text-black font-sans">
+  <header class="p-4 border-b shadow flex items-center justify-between">
+    <img src="public/images/logo-perkins-eastman.png" alt="Logo" class="h-12" />
+    <button onclick="location.href='Index.html'" style="padding: 0.5rem 1rem; background-color: #1D4ED8; color: white; border-radius: 5px; border: none;">
+      Go to Workflow
+    </button>
+  </header>
+ 
+
+<main class="p-4 max-w-6xl mx-auto">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+    
+    
+    <!-- Left Sidebar: Controls column (1 of 3) -->
+<div id="controlsColumn" class="flex flex-col gap-4 min-h-[600px] border bg-gray-50 p-4">
+  
+</div>
+
+
+    <!-- Main content: Map + Info (2 of 3) -->
+    <div class="md:col-span-2 flex flex-col gap-6">
+
+      <section id="map-application-content">
+        <h1 class="text-2xl font-bold mb-4">Mapbox Expansion Planner</h1>
+
+        <!-- Dropdown Controls -->
+        <div class="mb-4 flex gap-4 items-center flex-wrap">
+          <div class="flex items-center gap-2">
+            <label for="buildingType" class="font-semibold">Building Type:</label>
+            <select id="buildingType" class="border rounded p-2">
+              <option value="Administration">Administration</option>
+              <option value="Safety">Safety</option>
+              <option value="Operations">Operations</option>
+              <option value="Opportunity">Opportunity</option>
+              <option value="Support">Support</option>
+            </select>
+          </div>
+          <div class="flex items-center gap-2">
+            <label for="storyCount" class="font-semibold">Stories:</label>
+            <select id="storyCount" class="border rounded p-2">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+            </select>
+          </div>
+          <div class="flex items-center gap-2">
+            <label for="mapStyle" class="font-semibold">Map Style:</label>
+            <select id="mapStyle" class="border rounded p-2">
+              <option value="mapbox/streets-v11">Streets</option>
+              <option value="mapbox/light-v10">Grey Line</option>
+              <option value="mapbox/satellite-v9">Satellite</option>
+              
+            </select>
+          </div>
+        </div>
+
+        <!-- Map -->
+        <div id="map" class="h-96 w-full border mb-6"></div>
+
+        <!-- Table -->
+        <div>
+          <h2 class="text-xl font-semibold mb-2">Drawn Buildings</h2>
+          <table class="table-auto w-full border-collapse border border-gray-300" id="buildingsTable">
+            <thead>
+              <tr class="bg-gray-100">
+                <th class="border p-2 text-left">#</th>
+                <th class="border p-2 text-left">Building Type</th>
+                <th class="border p-2 text-left">Stories</th>
+                <th class="border p-2 text-left">Area (sqft)</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white text-sm" id="buildingsTableBody"></tbody>
+            <tfoot class="bg-gray-50 font-semibold text-sm">
+              <tr>
+                <td class="border p-2 text-left">&nbsp;</td>
+                <td class="border p-2 text-left">Total</td>
+                <td class="border p-2 text-left" id="totalStories">0</td>
+                <td class="border p-2 text-left" id="totalArea">0</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </section>
+
+
+
+    </div>
+  </div>
+</main>
+
+
+
+    <script src="script.js"></script>
+    
+  </body>
+</html>
