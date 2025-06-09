@@ -1098,7 +1098,7 @@ function determineFutureOutcome(school) {
   }
 
   if (count >= thresholds.systemsDeficient) {
-    return "Major Systemic Renovation";
+    return "Repurpose";
   }
 
   return "Sell";
@@ -1111,7 +1111,7 @@ function updateFutureSummary() {
     upgrade: 0,
     "Relocate": 0,
     "Sell": 0,
-    "Major Systemic Renovation": 0,
+    "Repurpose": 0,
     Renovation: 0,
     NA: 0
   };
@@ -1129,7 +1129,7 @@ function updateFutureSummary() {
   tbody.innerHTML = `
     <tr><td>keep</td><td>${futureSummary.keep}</td></tr>
     <tr><td>upgrade</td><td>${futureSummary.upgrade}</td></tr>
-    <tr><td>Repurpose</td><td>${futureSummary["Major Systemic Renovation"]}</td></tr>
+    <tr><td>Repurpose</td><td>${futureSummary["Repurpose"]}</td></tr>
     <tr><td>Sell</td><td>${futureSummary["Sell"]}</td></tr>
     <tr><td>Relocate</td><td>${futureSummary["Relocate"]}</td></tr>
   `;
@@ -1141,7 +1141,7 @@ function updateFutureSummary() {
     futureSummary.keep +
     futureSummary.upgrade +
     futureSummary["Relocate"] +
-    futureSummary["Major Systemic Renovation"] +
+    futureSummary["Repurpose"] +
     futureSummary["Sell"] +
     futureSummary.NA;
 }
