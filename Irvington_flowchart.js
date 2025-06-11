@@ -252,7 +252,7 @@ document.getElementById("grade-filter").addEventListener("change", () => {
 
 
     //Right Side Flowchart Sliders
-const campusScoreLabels = ["N/A", "", "Undersized", "Rightly Sized", "Oversized"];
+const campusScoreLabels = ["N/A", "", "Significantly Constrained", "Constrained", "No Constraints"];
 
 
 document.getElementById("campus-score-slider").addEventListener("input", e => {
@@ -283,7 +283,7 @@ document.getElementById("campus-score-label").textContent = campusScoreLabel;
       populateSchoolSummaryTable(schools);   // refresh full school table
     });
 
-  const eaLabels = ["N/A", "","Poor", "Fair", "Good", "Excellent"];
+  const eaLabels = ["N/A", "", "Significantly Constrained", "Constrained", "No Constraints"];
     document.getElementById("ea-slider").addEventListener("input", e => {
       const rawValue = parseInt(e.target.value, 10);
 
@@ -690,7 +690,7 @@ function drawFutureFlowchart(selectedSchoolName = "") {
   const nodes = [
     { 
   id: "campus", label: `${useCampusScoreToday ? "FY24-25" : "FY34-35"} Building\nis ${campusScoreLabels[thresholds.campusScore]}`, x: 10, y: 120, w: 200, h: 70 },
-    { id: "edAdeq", label: `Space Constraints \n is ${eaLabels[thresholds.eaIndex]} or less`, x: 260, y: 120, w: 200, h: 70 },
+    { id: "edAdeq", label: `Space Constraints: \n ${eaLabels[thresholds.eaIndex]}  \nor worse`, x: 260, y: 120, w: 200, h: 70 },
     { id: "funding", label: `Functional Fit ≥ ${thresholds.renovationFundingFactor.toFixed(1)}`, x: 510, y: 120, w: 200, h: 70 },
     { id: "modAge", label: `Modified Age\n≥ ${thresholds.modifiedAge}`, x: 760, y: 120, w: 200, h: 70 },
     { id: "historic", label: "Historic Building", x: 1010, y: 120, w: 200, h: 70 },
@@ -954,7 +954,7 @@ pathLinks.forEach(link => {
     pathLinks.push({ from: "campus", to: "edAdeq" });
 
     // Educational Adequacy check
-    const eaLabels = ["N/A", "","Poor", "Fair", "Good", "Excellent"];
+    const eaLabels = ["N/A", "", "Significantly Constrained", "Constrained", "No Constraints"];
     const eaValueIndex = eaLabels.indexOf(school.eaValue?.trim() || "N/A");
 
     if (eaValueIndex >= 0 && eaValueIndex <= thresholds.eaIndex) {
@@ -1064,16 +1064,16 @@ console.log("typeof determineFutureOutcome:", typeof determineFutureOutcome);
 
 // Future summary
 function determineFutureOutcome(school) {
-  const campusScoreLabels = ["N/A", "", "Deficient", "Poor", "Fair", "Good", "Excellent"];
+  const campusScoreLabels = ["N/A", "", "Significantly Constrained", "Constrained", "No Constraints"];
   const rawScore = useCampusScoreToday ? school.campusScoreToday : school.campusScore;
   const campusIndex = typeof rawScore === "number"
   ? rawScore
   : campusScoreLabels.indexOf((rawScore || "N/A").trim());
   const passesCampus = campusIndex >= 0 && campusIndex <= thresholds.campusScore;
 
-  const eaLabels = ["N/A", "", "Poor", "Fair", "Good", "Excellent"];
+  const eaLabels = ["N/A", "", "Significantly Constrained", "Constrained", "No Constraints"];
   const eaValueIndex = eaLabels.indexOf((school.eaValue || "N/A").trim());
-  const passesEA = eaValueIndex >= 0 && eaValueIndex <= thresholds.eaIndex;
+  const passesEA = eaValueIndex === 0 || (eaValueIndex > 0 && eaValueIndex <= thresholds.eaIndex);
 
   const passesFunding = school.fundingFactor > thresholds.renovationFundingFactor;
   const passesAge = school.modifiedAge > thresholds.modifiedAge;
