@@ -1,8 +1,8 @@
 PSC#,School (Full) Name,School Address,Grades Served,Latitude,Longitude,Current Enrollment (SY 24-25),Projected Enrollment (SY 33-34),State Rated Capacity,Utilization (SY24-25) (Percent),Utilization (SY33-34) (Percent),State Funding Score,Modified Building Age,EA - Total,EA Value,System,Building Size Adequacy,FCA System (24/25),FCA Campus Grade (34/35),FCA System (34/35),Historic Building
-1.001,Town Hall,"85 Main St, Irvington, NY 10533",Administration,41.03948235,-73.86797584,,,20,,,40,20,,Excellent,2,Undersized,Undersized,Undersized,Undersized,yes
-1.002,Recreation and Parks Building,"71 Main St, Irvington, NY 10533",Operations,41.03957998,-73.86905921,,,60,,,30,30,,Fair,3,Rightly Sized,Rightly Sized,Rightly Sized,Rightly Sized,yes
-1.003,Fire Department,"90 Main St, Irvington, NY 10533",Safety,41.03901817,-73.86777773,,,80,,,20,20,,Good,1,Rightly Sized,Rightly Sized,Rightly Sized,Rightly Sized,yes
-1.004,Irvington Seniors Citizens Center,"29 Bridge St, Irvington, NY 10533",Support,41.03776736,-73.87395768,,,10,,,60,10,,Good,5,Rightly Sized,Undersized,Undersized,Undersized,yes
-1.005,DPW Building,"8 S Astor St, Irvington, NY 10533",Operations,41.03983432,-73.87301691,,,12,,,10,85,,Excellent,2,Rightly Sized,Undersized,Undersized,Undersized,yes
-1.006,Public Library,"12 S Astor St, Irvington, NY 10533",Support,41.03958481,-73.87272644,,,132,,,60,10,,Excellent,2,Rightly Sized,Undersized,Undersized,Undersized,yes
-1.007,Park Site,,Opportunity,41.03500496,-73.8661785,,,4,,,90,0,,N/A,1,Opportunity,Opportunity,Opportunity,Opportunity,yes
+1.001,Town Hall,"85 Main St, Irvington, NY 10533",Administration,41.03948235,-73.86797584,,,20,,,40,20,,No Constraints,2,Significantly Constrained,Undersized,Significantly Constrained,Undersized,yes
+1.002,Recreation and Parks Building,"71 Main St, Irvington, NY 10533",Operations,41.03957998,-73.86905921,,,60,,,60,10,,Constrained,3,No Constraints,Rightly Sized,No Constraints,Rightly Sized,yes
+1.003,Fire Department,"90 Main St, Irvington, NY 10533",Safety,41.03901817,-73.86777773,,,80,,,20,20,,Constrained,1,Significantly Constrained,Rightly Sized,Significantly Constrained,Rightly Sized,yes
+1.004,Irvington Seniors Citizens Center,"29 Bridge St, Irvington, NY 10533",Support,41.03776736,-73.87395768,,,10,,,60,10,,No Constraints,5,No Constraints,Undersized,Rightly Sized,Undersized,yes
+1.005,DPW Building,"8 S Astor St, Irvington, NY 10533",Operations,41.03983432,-73.87301691,,,12,,,10,85,,Significantly Constrained,4,Significantly Constrained,Undersized,Significantly Constrained,Undersized,yes
+1.006,Public Library,"12 S Astor St, Irvington, NY 10533",Support,41.03958481,-73.87272644,,,132,,,60,10,,Constrained,2,No Constraints,Undersized,No Constraints,Undersized,yes
+1.007,Park Site,,Opportunity,41.03500496,-73.8661785,,,4,,,90,0,,No Constraints,1,No Constraints,Opportunity,No Constraints,Opportunity,yes
